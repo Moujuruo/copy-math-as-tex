@@ -2,10 +2,10 @@
 // @name         Copy MathJax/KaTeX/LaTeX as TeX
 // @name:zh-CN   复制数学公式为TeX
 // @namespace    http://tampermonkey.net/
-// @version      5.0
-// @description  Effortlessly copy paragraphs with mixed text and formulas.
-// @description:zh-CN 轻松复制文本公式混合段落。
-// @author       Gemini-Integrated & Gemini
+// @version      5.1
+// @description  Effortlessly copy paragraphs with mixed text and formulas, with an option to remove labels.
+// @description:zh-CN 轻松复制文本公式混合段落，可选择移除公式标签。
+// @author       Gemini & Moujuruo
 // @match        *://*/*
 // @grant        none
 // @run-at       document-body
@@ -13,12 +13,16 @@
 
 (function() {
     'use strict';
-    console.log("MathJax/KaTeX/LaTeX Copy Helper 5.0: INITIALIZED.");
+    console.log("MathJax/KaTeX/LaTeX Copy Helper 5.1: INITIALIZED.");
+
+    // --- NEW: Configuration Option ---
+    // Set to true to automatically remove \label{...} from copied formulas.
+    // Set to false to keep the labels.
+    const REMOVE_LABELS = true;
 
     const DISPLAY_MODE_ENVS = /\\begin{\s*(?:equation|align|gather|multline|flalign|alignat|matrix|pmatrix|bmatrix|vmatrix|Vmatrix|cases|drcases|split|array|tabular)/;
 
     function findTexSource(element) {
-        // ... (This function is unchanged from v4.8)
         if (typeof window.MathJax !== 'undefined' && window.MathJax.version.startsWith('3')) {
             if (window.MathJax.startup && window.MathJax.startup.document) {
                 const mathDoc = window.MathJax.startup.document;
@@ -87,7 +91,6 @@
     }
 
     document.addEventListener('copy', (event) => {
-        // ... (This function is unchanged)
         const selection = window.getSelection();
         if (selection.isCollapsed) return;
         const range = selection.getRangeAt(0);
@@ -140,19 +143,22 @@
             if (node.tagName === 'SCRIPT') { return ''; }
             if (node.dataset.myTempIgnore === 'true') { return ''; }
             if (node.dataset.myTempTex) {
-                const texSource = node.dataset.myTempTex.trim();
+                let texSource = node.dataset.myTempTex.trim();
                 const isBlock = node.dataset.myTempIsDisplay === 'true';
+
+                // --- MODIFIED: Automatically remove \label{...} if enabled ---
+                if (REMOVE_LABELS) {
+                    texSource = texSource.replace(/\\label\s*\{.*?\}/g, '').trim();
+                }
+
                 return isBlock ? `\n\n$$${texSource}$$\n\n` : ` $${texSource}$ `;
             }
         }
 
-        // --- MODIFICATION 5.0 START: Normalize text nodes ---
-        // This is the core fix. It replaces any newline characters within a text node with a space.
-        // This handles the case of "soft" newlines within a single <p> tag on arXiv.
+
         if (node.nodeType === Node.TEXT_NODE) {
             return node.textContent.replace(/[\r\n]+/g, ' ').replace(/\s{2,}/g, ' ');
         }
-        // --- MODIFICATION 5.0 END ---
 
         if (node.childNodes && node.childNodes.length > 0) {
             let text = '';
@@ -160,7 +166,6 @@
                 text += processFragment(child);
             }
             if (node.nodeType === Node.ELEMENT_NODE) {
-                // --- Reverted to v4.8 logic: DIV is a block element again ---
                 const isBlockElement = /^(P|DIV|H[1-6]|LI|BLOCKQUOTE|TR)$/.test(node.tagName);
                 if (isBlockElement && text.length > 0 && !text.endsWith('\n')) {
                     text += '\n';
