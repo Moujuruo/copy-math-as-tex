@@ -1,8 +1,11 @@
 # Copy-Math-as-TeX 轻松复制文本公式混合段落
 
-油猴脚本，轻松复制包含文本和公式的段落。
+油猴(Tampermonkey)脚本，轻松复制包含文本和公式的段落。
 
 目前支持 MathJax2、MathJax3、CSDN、ArXiv。
+
+可以通过 复制`copy-math-as-tex.js`文件内容 -> 油猴(Tampermonkey) -> 添加新脚本 -> 粘贴内容 -> 保存 来安装。（Recommended）
+也可以通过 [Chrome 拓展] copy-math-as-tex-extension.crx 来安装。（Released）
 
 ## DEMO
 
