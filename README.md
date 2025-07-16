@@ -5,6 +5,7 @@
 目前支持 MathJax2、MathJax3、CSDN、ArXiv。
 
 可以通过 复制`copy-math-as-tex.js`文件内容 -> 油猴(Tampermonkey) -> 添加新脚本 -> 粘贴内容 -> 保存 来安装。（Recommended）
+
 也可以通过 [Chrome 拓展] copy-math-as-tex-extension.crx 来安装。（Released）
 
 ## DEMO
