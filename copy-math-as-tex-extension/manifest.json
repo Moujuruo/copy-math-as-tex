@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Copy Math as TeX",
+  "version": "1.0",
+  "description": "Effortlessly copy paragraphs with mixed text and formulas from MathJax/KaTeX as clean TeX.",
+  "author": "Gemini & Moujuruo",
+
+
+
+  "permissions": [
+    "clipboardWrite"
+  ],
+
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_end"
+    }
+  ]
+}
